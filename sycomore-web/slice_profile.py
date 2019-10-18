@@ -51,7 +51,7 @@ def update_plot(change):
     
     # NOTE: with 1-D EPG, the slice-selection gradient is played on the first/only 
     # axis, which is also the readout axis. The roles of transversal and 
-    # longitudinal are thus flipped.
+    # longitudinal are thus flipped (cf. the labels of the plots)
     x_axis = numpy.asarray([
         (2*numpy.pi*x/sinc_pulse.get_gradient_moment()[2]).convert_to(mm) 
         for x in range(len(M_transversal))])
