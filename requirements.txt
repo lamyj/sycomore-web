@@ -1,0 +1,4 @@
+ipywidgets
+numpy
+sycomore
+voila
