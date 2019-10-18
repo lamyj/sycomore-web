@@ -1,3 +1,4 @@
+bqplot
 ipywidgets
 numpy
 sycomore
