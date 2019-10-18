@@ -1,14 +1,12 @@
-# https://linuxfr.org/news/creer-une-application-web-avec-jupyter-ipywidgets-et-voila-7b03d5dd-ab10-47cb-a2bd-bd99fa9e2457
-# Run `voila app.ipynb`
-
 import ipywidgets
 
 import fse
 import rf_spoiling
+import slice_profile
 
-tabs = [fse, rf_spoiling]
+tabs = [rf_spoiling, slice_profile]
 
-tab_widget = ipywidgets.widgets.Tab([x.tab for x in tabs], selected_index = 1)
+tab_widget = ipywidgets.widgets.Tab([x.tab for x in tabs], selected_index=0)
 for index, tab in enumerate(tabs):
     tab_widget.set_title(index, tab.name)
 

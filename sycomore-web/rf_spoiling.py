@@ -1,4 +1,3 @@
-# https://linuxfr.org/news/creer-une-application-web-avec-jupyter-ipywidgets-et-voila-7b03d5dd-ab10-47cb-a2bd-bd99fa9e2457
 import bqplot.pyplot
 import ipywidgets
 import numpy
