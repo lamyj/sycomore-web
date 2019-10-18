@@ -1,6 +1,6 @@
 FROM heroku/miniconda
 
-ADD ./requirements.txt /tmp/requirements.txt
+ADD ./sycomore-web/requirements.txt /tmp/requirements.txt
 ADD ./sycomore-web /opt/sycomore-web/
 
 RUN pip install -qr /tmp/requirements.txt
