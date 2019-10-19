@@ -95,5 +95,3 @@ tab = ipywidgets.widgets.HBox([
             [sequence_label, flip_angle, TE, TR, phase_step], 
             layout={"border": "1px solid"})]),
     figure])
-
-update_plot(None)

@@ -111,5 +111,3 @@ tab = ipywidgets.widgets.HBox([
             [pulse_label, flip_angle, pulse_duration, zero_crossings], 
             layout={"border": "1px solid"})]),
     figure])
-
-update_plot(None)
