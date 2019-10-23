@@ -3,10 +3,14 @@ import pathlib
 import ipywidgets
 
 import fse
-import rf_spoiling
+import rf_spoiling_efficiency
+import rf_spoiling_evolution
 import slice_profile
 
-tabs = [rf_spoiling, slice_profile]
+tabs = [
+    fse, 
+    rf_spoiling_evolution, rf_spoiling_efficiency, 
+    slice_profile]
 
 initialized_tabs = set()
 def on_tab_selected(change):

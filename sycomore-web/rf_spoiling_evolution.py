@@ -8,7 +8,7 @@ from sycomore.units import *
 
 import utils
 
-name = "RF spoiling"
+name = "RF spoiling (1)"
 
 def rf_spoiling(
         model, flip_angle, TE, TR, slice_thickness, phase_step, repetitions):
