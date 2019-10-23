@@ -1,8 +1,12 @@
+import time
+
 import bqplot.pyplot
 import ipywidgets
 import numpy
 import sycomore
 from sycomore.units import *
+
+import utils
 
 name = "Slice profile"
 
@@ -16,6 +20,8 @@ bqplot.pyplot.ylabel("Magnitude")
 bqplot.pyplot.legend()
 
 def update_plot(change):
+    start = time.time()
+    
     slice_thickness = 1*mm
     pulse_support_size = 101
 
@@ -81,6 +87,9 @@ def update_plot(change):
     longitudinal_plot.y = numpy.abs(M_longitudinal)
     
     bqplot.pyplot.xlim(x_axis[0], x_axis[-1])
+    
+    stop = time.time()
+    runtime.value = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
 
 species_label = ipywidgets.widgets.HTML(value="""<div style="text-align:center; font-size: larger">Species</div>""")
 T1 = ipywidgets.widgets.BoundedIntText(
@@ -99,6 +108,8 @@ zero_crossings = ipywidgets.widgets.BoundedIntText(
     min=1, max=20, value=10, step=1, description="Zero-crossings",
     continuous_update=False, style={"description_width": "initial"})
 
+runtime = ipywidgets.widgets.Label()
+
 for widget in [T1, T2, flip_angle, pulse_duration, zero_crossings]:
     widget.observe(update_plot, names="value")
 
@@ -109,5 +120,6 @@ tab = ipywidgets.widgets.HBox([
             layout={"border": "1px solid"}),
         ipywidgets.widgets.VBox(
             [pulse_label, flip_angle, pulse_duration, zero_crossings], 
-            layout={"border": "1px solid"})]),
+            layout={"border": "1px solid"}),
+        runtime]),
     figure])

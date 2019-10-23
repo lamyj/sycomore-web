@@ -1,8 +1,12 @@
+import time
+
 import bqplot.pyplot
 import ipywidgets
 import numpy
 import sycomore
 from sycomore.units import *
+
+import utils
 
 name = "RF spoiling"
 
@@ -43,6 +47,8 @@ bqplot.pyplot.ylim(0, 0.6)
 bqplot.pyplot.legend()
 
 def update_plot(change):
+    start = time.time()
+    
     slice_thickness = 1*mm
 
     species = sycomore.Species(T1.value*ms, T2.value*ms)
@@ -63,6 +69,9 @@ def update_plot(change):
     ideal_spoiling_plot.y = [ideal_spoiling, ideal_spoiling]
     
     bqplot.pyplot.xlim(0, repetitions)
+    
+    stop = time.time()
+    runtime.value = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
 
 species_label = ipywidgets.widgets.HTML(value="""<div style="text-align:center; font-size: larger">Species</div>""")
 T1 = ipywidgets.widgets.BoundedIntText(
@@ -83,6 +92,8 @@ phase_step = ipywidgets.widgets.IntSlider(
     min=0, max=180, value=0, step=1, description="Phase step (°)",
     continuous_update=False, style={"description_width": "initial"})
 
+runtime = ipywidgets.widgets.Label()
+
 for widget in [T1, T2, flip_angle, TE, TR, phase_step]:
     widget.observe(update_plot, names="value")
 
@@ -93,5 +104,6 @@ tab = ipywidgets.widgets.HBox([
             layout={"border": "1px solid"}),
         ipywidgets.widgets.VBox(
             [sequence_label, flip_angle, TE, TR, phase_step], 
-            layout={"border": "1px solid"})]),
+            layout={"border": "1px solid"}),
+        runtime]),
     figure])
