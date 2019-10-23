@@ -10,9 +10,7 @@ tabs = [rf_spoiling, slice_profile]
 
 initialized_tabs = set()
 def on_tab_selected(change):
-    if change["new"] not in initialized_tabs:
-        tabs[change["new"]].init()
-        initialized_tabs.add(change["new"])
+    tabs[change["new"]].init()
 
 here = pathlib.Path(__file__).parent
 style = ipywidgets.widgets.HTML(
