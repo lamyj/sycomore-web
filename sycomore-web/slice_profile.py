@@ -10,9 +10,40 @@ import utils
 
 name = "Slice profile"
 
+common_attributes = {
+    "continuous_update": False, "style": {"description_width": "initial"}}
+widgets = {
+    "species": {
+        "label": ipywidgets.widgets.HTML(value="""<h1 class="group">Species</h1>"""),
+        "T1": ipywidgets.widgets.BoundedIntText(
+            min=0, max=2000, value=600, step=1, description="T<sub>1</sub> (ms)",
+            **common_attributes),
+        "T2": ipywidgets.widgets.BoundedIntText(
+            min=0, max=2000, value=400, step=1, description="T<sub>2</sub> (ms)",
+            **common_attributes),
+    },
+    "pulse": {
+        "label": ipywidgets.widgets.HTML(value="""<h1 class="group">Pulse</h1>"""),
+        "flip_angle": ipywidgets.widgets.IntSlider(
+            min=0, max=90, value=90, step=1, description="Flip angle (°)",
+            continuous_update=False, style={"description_width": "initial"}),
+        "duration": ipywidgets.widgets.BoundedIntText(
+            min=1, max=20, value=10, step=1, description="Duration (ms)",
+            continuous_update=False, style={"description_width": "initial"}),
+        "zero_crossings": ipywidgets.widgets.BoundedIntText(
+            min=1, max=20, value=10, step=1, description="Zero-crossings",
+            continuous_update=False, style={"description_width": "initial"}),
+    },
+    "runtime": {"label": ipywidgets.widgets.Label()}
+}
+
+
+fig_layout = ipywidgets.widgets.Layout(width="750px", height="500px")
+
 figure = bqplot.pyplot.figure(
     legend_location="top-right", 
-    fig_margin={"top": 0, "bottom": 30, "left": 60, "right": 20})
+    fig_margin={"top": 0, "bottom": 30, "left": 60, "right": 20},
+    layout=fig_layout)
 transversal_plot = bqplot.pyplot.plot([], [], "-b", labels=["M⟂"])
 longitudinal_plot = bqplot.pyplot.plot([], [], "-g", labels=["M∥"])
 bqplot.pyplot.xlabel("Position (mm)")
@@ -25,22 +56,23 @@ def update_plot(change):
     slice_thickness = 1*mm
     pulse_support_size = 101
 
-    t0 = pulse_duration.value*ms/(2*zero_crossings.value)
+    t0 = widgets["pulse"]["duration"].value*ms/(2*widgets["pulse"]["zero_crossings"].value)
 
-    support = sycomore.linspace(pulse_duration.value*ms, pulse_support_size)
+    support = sycomore.linspace(widgets["pulse"]["duration"].value*ms, pulse_support_size)
     envelope = sycomore.sinc_envelope(t0)
     bandwidth = 1/t0
 
     sinc_pulse = sycomore.HardPulseApproximation(
-        sycomore.Pulse(flip_angle.value*deg, 0*deg), support, envelope, 
-        bandwidth, slice_thickness/2, "")
+        sycomore.Pulse(widgets["pulse"]["flip_angle"].value*deg, 0*deg), 
+        support, envelope, bandwidth, slice_thickness/2, "")
     gradient_duration = sinc_pulse.get_time_interval().duration
     gradient_amplitude = (
         sinc_pulse.get_time_interval().gradient_moment[2]
         /(2*numpy.pi*sycomore.gamma)
         /sinc_pulse.get_time_interval().duration)
     
-    species = sycomore.Species(T1.value*ms, T2.value*ms)
+    species = sycomore.Species(
+        widgets["species"]["T1"].value*ms, widgets["species"]["T2"].value*ms)
     
     model = sycomore.epg.Discrete3D(species)
     for index, hard_pulse in enumerate(sinc_pulse.get_pulses()):
@@ -66,9 +98,9 @@ def update_plot(change):
     M_transversal = numpy.fft.fftshift(numpy.fft.ifft(F, norm="ortho"))
     M_longitudinal = numpy.fft.fftshift(numpy.fft.ifft(Z, norm="ortho"))
     
-    x_axis = numpy.asarray([
-        (2*numpy.pi*x/sinc_pulse.get_gradient_moment()[2]).convert_to(mm) 
-        for x in range(len(M_transversal))])
+    step = (2*numpy.pi/sinc_pulse.get_gradient_moment()[2]).convert_to(mm)
+    # The following line is almost 400 ms
+    x_axis = numpy.asarray([step*x for x in range(len(M_transversal))])
     x_axis -= 0.5*(x_axis[0]+x_axis[-1])
     
     # Crop between [-slice_thickness, +slice_thickness]
@@ -91,35 +123,18 @@ def update_plot(change):
     stop = time.time()
     runtime.value = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
 
-species_label = ipywidgets.widgets.HTML(value="""<div style="text-align:center; font-size: larger">Species</div>""")
-T1 = ipywidgets.widgets.BoundedIntText(
-    min=0, max=2000, value=1000, step=1, description="T_1 (ms)")
-T2 = ipywidgets.widgets.BoundedIntText(
-    min=0, max=2000, value=100, step=1, description="T_2 (ms)")
-
-pulse_label = ipywidgets.widgets.HTML(value="""<div style="text-align:center; font-size: larger">Pulse</div>""")
-flip_angle = ipywidgets.widgets.IntSlider(
-    min=0, max=90, value=90, step=1, description="Flip angle (°)",
-    continuous_update=False, style={"description_width": "initial"})
-pulse_duration = ipywidgets.widgets.BoundedIntText(
-    min=1, max=20, value=10, step=1, description="Duration (ms)",
-    continuous_update=False, style={"description_width": "initial"})
-zero_crossings = ipywidgets.widgets.BoundedIntText(
-    min=1, max=20, value=10, step=1, description="Zero-crossings",
-    continuous_update=False, style={"description_width": "initial"})
-
-runtime = ipywidgets.widgets.Label()
-
-for widget in [T1, T2, flip_angle, pulse_duration, zero_crossings]:
-    widget.observe(update_plot, names="value")
+for group in widgets.values():
+    for widget in group.values():
+        if not isinstance(widget, ipywidgets.widgets.Label):
+            widget.observe(update_plot, names="value")
 
 tab = ipywidgets.widgets.HBox([
     ipywidgets.widgets.VBox([
-        ipywidgets.widgets.VBox(
-            [species_label, T1,T2], 
-            layout={"border": "1px solid"}),
-        ipywidgets.widgets.VBox(
-            [pulse_label, flip_angle, pulse_duration, zero_crossings], 
-            layout={"border": "1px solid"}),
-        runtime]),
-    figure])
+        ipywidgets.widgets.VBox(list(group.values()), layout={"border": "1px solid"}) 
+        for group in widgets.values()
+    ]),
+    figure
+])
+
+def init():
+    update_plot(None)

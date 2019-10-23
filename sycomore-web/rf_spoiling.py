@@ -35,9 +35,42 @@ def compute_ideal_spoiling(species, flip_angle, TR):
     signal = numpy.sin(alpha)*(1-E1)/(1-numpy.cos(alpha)*E1)
     return signal
 
+common_attributes = {
+    "continuous_update": False, "style": {"description_width": "initial"}}
+widgets = {
+    "species": {
+        "label": ipywidgets.widgets.HTML(value="""<h1 class="group">Species</h1>"""),
+        "T1": ipywidgets.widgets.BoundedIntText(
+            min=0, max=2000, value=1000, step=1, description="T<sub>1</sub> (ms)",
+            **common_attributes),
+        "T2": ipywidgets.widgets.BoundedIntText(
+            min=0, max=2000, value=1000, step=1, description="T<sub>2</sub> (ms)",
+            **common_attributes),
+    },
+    "sequence": {
+        "label": ipywidgets.widgets.HTML(value="""<h1 class="group">Sequence</h1>"""),
+        "flip_angle": ipywidgets.widgets.IntSlider(
+            min=0, max=90, value=30, step=1, description="Flip angle (°)",
+            **common_attributes),
+        "TE": ipywidgets.widgets.BoundedIntText(
+            min=0, max=2000, value=5, step=1, description="TE (ms)",
+            **common_attributes),
+        "TR": ipywidgets.widgets.BoundedIntText(
+            min=0, max=2000, value=25, step=1, description="TR (ms)",
+            **common_attributes),
+        "phase_step": ipywidgets.widgets.IntSlider(
+            min=0, max=180, value=0, step=1, description="Phase step (°)",
+            **common_attributes),
+    },
+    "runtime": {"label": ipywidgets.widgets.Label()}
+}  
+
+fig_layout = ipywidgets.widgets.Layout(width="750px", height="500px")
+
 figure = bqplot.pyplot.figure(
     legend_location="top-right", 
-    fig_margin={"top": 0, "bottom": 30, "left": 60, "right": 20})
+    fig_margin={"top": 0, "bottom": 30, "left": 60, "right": 20},
+    layout=fig_layout)
 signal_plot = bqplot.pyplot.plot([], [], labels=["Signal"])
 ideal_spoiling_plot = bqplot.pyplot.plot(
     [], [], ":k", labels=["Ideal spoiling"])
@@ -51,59 +84,44 @@ def update_plot(change):
     
     slice_thickness = 1*mm
 
-    species = sycomore.Species(T1.value*ms, T2.value*ms)
+    species = sycomore.Species(
+        widgets["species"]["T1"].value*ms, widgets["species"]["T2"].value*ms)
     model = sycomore.epg.Regular(species)
     
-    repetitions = int((4*species.T1/(TR.value*ms)).magnitude)
+    repetitions = int((4*species.T1/(widgets["sequence"]["TR"].value*ms)).magnitude)
     
     echoes = rf_spoiling(
-        model, flip_angle.value*deg, TE.value*ms, TR.value*ms, slice_thickness, 
-        phase_step.value*deg, repetitions)
+        model, widgets["sequence"]["flip_angle"].value*deg, 
+        widgets["sequence"]["TE"].value*ms, widgets["sequence"]["TR"].value*ms, 
+        slice_thickness, widgets["sequence"]["phase_step"].value*deg, 
+        repetitions)
     
     signal_plot.x = range(repetitions)
     signal_plot.y = numpy.abs(echoes)
     
     ideal_spoiling = compute_ideal_spoiling(
-        species, flip_angle.value*deg, TR.value*ms)
+        species, widgets["sequence"]["flip_angle"].value*deg, 
+        widgets["sequence"]["TR"].value*ms)
     ideal_spoiling_plot.x = [0, repetitions]
     ideal_spoiling_plot.y = [ideal_spoiling, ideal_spoiling]
     
     bqplot.pyplot.xlim(0, repetitions)
     
     stop = time.time()
-    runtime.value = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
+    widgets["runtime"]["label"].value = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
 
-species_label = ipywidgets.widgets.HTML(value="""<div style="text-align:center; font-size: larger">Species</div>""")
-T1 = ipywidgets.widgets.BoundedIntText(
-    min=0, max=2000, value=1000, step=1, description="T_1 (ms)")
-T2 = ipywidgets.widgets.BoundedIntText(
-    min=0, max=2000, value=1000, step=1, description="T_2 (ms)")
-
-sequence_label = ipywidgets.widgets.HTML(value="""<div style="text-align:center; font-size: larger">Sequence</div>""")
-flip_angle = ipywidgets.widgets.IntSlider(
-    min=0, max=90, value=30, step=1, description="Flip angle (°)",
-    continuous_update=False, style={"description_width": "initial"})    
-TE = ipywidgets.widgets.BoundedIntText(
-    min=0, max=2000, value=5, step=1, description="TE (ms)")
-TR = ipywidgets.widgets.BoundedIntText(
-    min=0, max=2000, value=25, step=1, description="TR (ms)")
-
-phase_step = ipywidgets.widgets.IntSlider(
-    min=0, max=180, value=0, step=1, description="Phase step (°)",
-    continuous_update=False, style={"description_width": "initial"})
-
-runtime = ipywidgets.widgets.Label()
-
-for widget in [T1, T2, flip_angle, TE, TR, phase_step]:
-    widget.observe(update_plot, names="value")
+for group in widgets.values():
+    for widget in group.values():
+        if not isinstance(widget, ipywidgets.widgets.Label):
+            widget.observe(update_plot, names="value")
 
 tab = ipywidgets.widgets.HBox([
     ipywidgets.widgets.VBox([
-        ipywidgets.widgets.VBox(
-            [species_label, T1,T2], 
-            layout={"border": "1px solid"}),
-        ipywidgets.widgets.VBox(
-            [sequence_label, flip_angle, TE, TR, phase_step], 
-            layout={"border": "1px solid"}),
-        runtime]),
-    figure])
+        ipywidgets.widgets.VBox(list(group.values()), layout={"border": "1px solid"}) 
+        for group in widgets.values()
+    ]),
+    figure
+])
+
+def init():
+    update_plot(None)
