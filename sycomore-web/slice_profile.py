@@ -121,7 +121,7 @@ def update_plot(change):
     bqplot.pyplot.xlim(x_axis[0], x_axis[-1])
     
     stop = time.time()
-    runtime.value = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
+    widgets["runtime"]["label"].value = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
 
 for group in widgets.values():
     for widget in group.values():

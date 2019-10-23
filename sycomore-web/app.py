@@ -1,3 +1,5 @@
+import pathlib
+
 import ipywidgets
 
 import fse
@@ -9,14 +11,19 @@ tabs = [rf_spoiling, slice_profile]
 initialized_tabs = set()
 def on_tab_selected(change):
     if change["new"] not in initialized_tabs:
-        tabs[change["new"]].update_plot(None)
+        tabs[change["new"]].init()
         initialized_tabs.add(change["new"])
 
-tab_widget = ipywidgets.widgets.Tab([x.tab for x in tabs], selected_index=0)
+here = pathlib.Path(__file__).parent
+style = ipywidgets.widgets.HTML(
+    f"""<style>{(here/"style.css").read_text()}</style>""")
+
+tab_widget = ipywidgets.widgets.Tab([x.tab for x in tabs])
 for index, tab in enumerate(tabs):
     tab_widget.set_title(index, tab.name)
 tab_widget.observe(on_tab_selected, names="selected_index")
 main = ipywidgets.VBox([
-    ipywidgets.widgets.HTML(value="""<h1 style="text-align:center">MRI Simulation</h1>"""), 
+    ipywidgets.widgets.HTML(
+        """<h1 class="main">Interactive MRI Simulations</h1>"""), 
     tab_widget])
-on_tab_selected({"new": 0})
+tab_widget.selected_index = 0
