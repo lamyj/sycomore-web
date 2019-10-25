@@ -1,5 +1,0 @@
-bqplot
-ipywidgets
-numpy
-sycomore
-voila
