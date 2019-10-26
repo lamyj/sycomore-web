@@ -2,10 +2,33 @@
 
 {% block preamble %}
 <style>
-  div.box { border: 1px solid !important; }
-  div.group-title { font-weight: bold; }
-  h1.main { display: inline; }
+  body { font-family: sans-serif; margin: 0px; }
+  nav.menu { 
+    background-color: black; 
+    margin-bottom: 0.5em;
+    padding: 0.5em;
+  }
+  h1.main { display: inline; font-size: medium; }
   ul.menu { display: inline; }
   ul.menu li { display: inline; list-style-type: none; margin-right: 1em }
+  nav.menu a { color: white; font-size: medium; text-decoration: none; }
+  
+  div.bk-root { padding: 8px;}
+  
+  div.box { border: 1px solid !important; }
+  div.group-title { font-weight: bold; }
+  
 </style>
+{% endblock %}
+
+{% block inner_body %}
+<nav class="menu">
+<h1 class="main"><a href="?e=home">Sycomore</a></h1>
+<ul class="menu">
+{% for name, module in experiments.items() %}
+  {% if name != "home" %}<li><a href="?e={{ name }}">{{ module.title }}</a></li>{% endif %}
+{% endfor %}
+</ul>
+</nav>
+{{ super() }}
 {% endblock %}

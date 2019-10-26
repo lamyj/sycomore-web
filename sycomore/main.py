@@ -1,4 +1,3 @@
-import bokeh.layouts
 import bokeh.models
 import bokeh.plotting
 
@@ -18,30 +17,19 @@ experiments = {
 arguments = bokeh.plotting.curdoc().session_context.request.arguments
 experiment = arguments.get("e", [b"home"])[0].decode()
 
-header = bokeh.models.Div(
-    text=
-        """<h1 class="main">Sycomore</h1>"""
-        +"""<ul class="menu">"""
-        +"".join(
-            """<li><a href="?e={}">{}</a></li>""".format(k, v.title) 
-            for k,v in experiments.items())
-        +"</ul>")
-
 if experiment in experiments:
     contents = experiments[experiment].create_contents()
     title = experiments[experiment].title
 else:
+    experiment = None
     contents = bokeh.models.Div(text="<h1>Unknown experiment</h1>")
     title = "Error"
 
-layout = bokeh.layouts.layout(
-    [
-        [header],
-        [contents]
-    ], 
-    sizing_mode="scale_both")
+contents.sizing_mode = "scale_both"
 
-bokeh.plotting.curdoc().add_root(layout)
+bokeh.plotting.curdoc().add_root(contents)
+bokeh.plotting.curdoc().template_variables["experiments"] = experiments
 bokeh.plotting.curdoc().title = title
 
-experiments[experiment].init()
+if experiment is not None:
+    experiments[experiment].init()
