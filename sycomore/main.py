@@ -1,18 +1,21 @@
+import collections
+
 import bokeh.models
 import bokeh.plotting
 
-import fse
 import home
+import rare
 import rf_spoiling_evolution
 import rf_spoiling_efficiency
 import slice_profile
 
-experiments = {
-    x.__name__: x for x in [
+experiments = collections.OrderedDict(
+    (x.__name__, x) 
+    for x in [
         home, 
-        fse, 
+        rare, 
         rf_spoiling_evolution, rf_spoiling_efficiency, 
-        slice_profile]}
+        slice_profile])
 
 arguments = bokeh.plotting.curdoc().session_context.request.arguments
 experiment = arguments.get("e", [b"home"])[0].decode()

@@ -9,7 +9,7 @@ from sycomore.units import *
 
 import utils
 
-title = "Fast Spin Echo"
+title = "RARE"
 
 time_step = 10*ms
 
