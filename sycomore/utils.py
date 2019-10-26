@@ -16,4 +16,4 @@ def to_eng_string(value, unit, decimals=None):
     mantissa = value/10**eng_exponent
     if decimals is not None:
         mantissa = numpy.round(mantissa)
-    return f"{mantissa} {prefix}{unit}"
+    return "{} {}{}".format(mantissa, prefix, unit)
