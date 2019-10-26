@@ -174,7 +174,8 @@ def update():
         "y_min": numpy.min(phases, axis=0), "y_max": numpy.max(phases, axis=0) }
     
     stop = time.time()
-    document.get_model_by_id("runtime").text = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
+    document.get_model_by_id("runtime").text = "Runtime: {}".format(
+        utils.to_eng_string(stop-start, "s", 1))
     
 def init():
     update()

@@ -155,7 +155,8 @@ def update():
     longitudinal_data.data = { "x": x_axis, "y": numpy.abs(M_longitudinal) }
     
     stop = time.time()
-    document.get_model_by_id("runtime").text = f"""Runtime: {utils.to_eng_string(stop-start, "s", 3)}"""
+    document.get_model_by_id("runtime").text = "Runtime: {}".format(
+        utils.to_eng_string(stop-start, "s", 3))
 
 def init():
     update()

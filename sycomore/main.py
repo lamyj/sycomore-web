@@ -22,7 +22,9 @@ header = bokeh.models.Div(
     text=
         """<h1 class="main">Sycomore</h1>"""
         +"""<ul class="menu">"""
-        +"".join(f"""<li><a href="?e={k}">{v.title}</a></li>""" for k,v in experiments.items())
+        +"".join(
+            """<li><a href="?e={}">{}</a></li>""".format(k, v.title) 
+            for k,v in experiments.items())
         +"</ul>")
 
 if experiment in experiments:

@@ -113,7 +113,8 @@ def update():
         "y": (ideal_spoiling, ideal_spoiling) }
     
     stop = time.time()
-    document.get_model_by_id("runtime").text = f"""Runtime: {utils.to_eng_string(stop-start, "s", 1)}"""
+    document.get_model_by_id("runtime").text = "Runtime: {}".format(
+        utils.to_eng_string(stop-start, "s", 1))
 
 def init():
     update()
