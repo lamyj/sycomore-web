@@ -92,7 +92,7 @@ def update():
     species = sycomore.Species(T1, T2)
     repetitions = int((4*species.T1/TR).magnitude)
     
-    phase_steps = [x*deg for x in range(0, 181)]
+    phase_steps = [x*deg for x in numpy.arange(0, 181, 1.5)]
     
     steady_states = [
         rf_spoiling(

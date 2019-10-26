@@ -113,7 +113,7 @@ def update():
     m0 = [0., 0., 1., 1.]
     
     voxel_size = 1*mm
-    positions_count = 256
+    positions_count = 192
     
     steps = 1+int((repetitions*TR/time_step).magnitude)
     times = [x.convert_to(s) for x in sycomore.linspace(0*s, repetitions*TR, steps)]
