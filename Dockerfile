@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:buster
 
 ADD ./sycomore/requirements.txt /tmp/requirements.txt
 
@@ -14,6 +14,6 @@ CMD \
   bokeh serve \
     --address=0.0.0.0 --port=$PORT \
     --allow-websocket-origin=sycomore.herokuapp.com \
-    --allow-websocket-origin=localhost:5006 \
+    --allow-websocket-origin=localhost:${PORT} \
     --use-xheaders \
     ./ 
