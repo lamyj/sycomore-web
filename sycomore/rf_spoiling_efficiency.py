@@ -56,6 +56,11 @@ def create_contents():
     # Interactions
     for control in [T1, T2, flip_angle, TE, TR]:
         control.on_change("value_throttled", lambda attr, old, new: update())
+    T1.js_link("value_throttled", T2, "end")
+    T1.on_change(
+        "value_throttled", 
+        lambda attr, old, new: T2.update(
+            end=min(new, T2.end), value=min(new, T2.value)))
 
     # Layout
     inputs = bokeh.layouts.column(
