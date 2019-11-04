@@ -1,11 +1,8 @@
-FROM debian:buster
+FROM python:3.8.0
 
 ADD ./sycomore/requirements.txt /tmp/requirements.txt
 
-RUN \
-  apt-get update && \
-  apt-get install -y python3 python3-pip && \
-  pip3 install -r /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt
 
 ADD ./sycomore /opt/sycomore/
 WORKDIR /opt/sycomore
