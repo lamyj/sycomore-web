@@ -106,7 +106,7 @@ def update():
 
     sinc_pulse = sycomore.HardPulseApproximation(
         sycomore.Pulse(flip_angle, 0*deg), 
-        support, envelope, bandwidth, slice_thickness/2, "")
+        support, envelope, bandwidth, slice_thickness, "")
     gradient_duration = sinc_pulse.get_time_interval().duration
     gradient_amplitude = (
         sinc_pulse.get_time_interval().gradient_moment[2]
@@ -122,26 +122,32 @@ def update():
             gradient_duration, [0*T/m, 0*T/m, gradient_amplitude])
     
     # Unfold the F and the Z states: create an array for all orders, including
-    # empty ones
-    orders = numpy.reshape(model.orders, (-1,3))[:,2]
-    orders = [int(x.magnitude) for x in orders / model.bin_width]
-    F = numpy.zeros(2*max(orders)+1, model.states.dtype)
-    Z = numpy.zeros(2*max(orders)+1, model.states.dtype)
-    for order, state in zip(orders, model.states):
-        F[order] = state[0]
-        Z[order] = state[2]
+    # empty ones.
+    max_order = numpy.max(model.orders, axis=0)[2]
+    max_bin = int(max_order/model.bin_width)
+    F = numpy.zeros(2*max_bin+1, model.states.dtype)
+    Z = numpy.zeros(2*max_bin+1, model.states.dtype)
+    for order, state in zip(model.orders, model.states):
+        bin = int(order[2]/model.bin_width)
+        # WARNING: since we de-bin the orders, we need to scale the population
+        F[bin] = F.shape[0]*state[0]
+        Z[bin] = F.shape[0]*state[2]
         
         if order != 0:
-            F[-order] = state[1].conj()
-            Z[-order] = state[2]
+            F[-bin] = F.shape[0]*state[1].conj()
+            Z[-bin] = F.shape[0]*state[2]
     
     # Perform iFFT, and shift it since the spatial axis must be centered on zero.
-    M_transversal = numpy.fft.fftshift(numpy.fft.ifft(F, norm="ortho"))
-    M_longitudinal = numpy.fft.fftshift(numpy.fft.ifft(Z, norm="ortho"))
+    M_transversal = numpy.fft.fftshift(numpy.fft.ifft(F))
+    M_longitudinal = numpy.fft.fftshift(numpy.fft.ifft(Z))
     
-    step = (2*numpy.pi/sinc_pulse.get_gradient_moment()[2]).convert_to(mm)
-    # The following line is almost 400 ms
-    x_axis = numpy.asarray([step*x for x in range(len(M_transversal))])
+    # Frequency ranges from -max_order to +max_order: the spatial step size
+    # is then given by the following expression.
+    # WARNING bin_size should play a role here. With bin_size=1*rad/m, no 
+    # additional step is required
+    step = (1/(2*max_order)).convert_to(mm)
+    
+    x_axis = step*numpy.arange(len(M_transversal))
     x_axis -= 0.5*(x_axis[0]+x_axis[-1])
     
     # Crop between [-slice_thickness, +slice_thickness]
