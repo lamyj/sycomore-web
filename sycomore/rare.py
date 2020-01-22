@@ -54,7 +54,8 @@ def create_contents():
     magnitude_plot = bokeh.plotting.figure(
         id="magnitude_plot",
         aspect_ratio=3,
-        title="", sizing_mode="scale_both", toolbar_location=None)
+        title="", sizing_mode="scale_both", toolbar_location=None,
+        margin=[0,50,0,0])
     magnitude_plot.yaxis.axis_label = "Magnitude"
     magnitude_plot.x_range.range_padding = 0
     magnitude_plot.y_range.start=0
@@ -65,7 +66,8 @@ def create_contents():
     phase_plot = bokeh.plotting.figure(
         id="phase_plot",
         aspect_ratio=3,
-        title="", sizing_mode="scale_both", toolbar_location=None)
+        title="", sizing_mode="scale_both", toolbar_location=None, 
+        margin=[0,50,0,0])
     phase_plot.xaxis.axis_label = "Time (ms)"
     phase_plot.yaxis.axis_label = "Phase (rad)"
     phase_plot.x_range.range_padding = 0
@@ -120,8 +122,8 @@ def update():
     voxel_size = 1*mm
     positions_count = 192
     
-    steps = 1+int((repetitions*TR/time_step).magnitude)
-    times = [x.convert_to(s) for x in sycomore.linspace(0*s, repetitions*TR, steps)]
+    steps = 1+int(repetitions*TR/time_step)
+    times = sycomore.linspace(0*s, repetitions*TR, steps)
 
     excitation = sycomore.bloch.pulse(excitation, 90*deg)
     refocalization = sycomore.bloch.pulse(refocalization, 0*rad)
@@ -138,20 +140,20 @@ def update():
         for position in positions])
     
     magnetizations = numpy.full((positions_count, steps, 4), m0)
-    time_step_s = time_step.convert_to(s)
-    half_echo = TE.convert_to(s)/2
+    # WARNING: floating-point modulo arithmetic is not reliable (pulses are
+    # missed). Switch to integer arithmetic in ms; this assumes that 
+    # time_step >= 2*ms.
+    TE_ms = int(numpy.round(TE.convert_to(ms)))
+    TR_ms = int(numpy.round(TR.convert_to(ms)))
     for step, t in enumerate(times[:-1]):
         
-        # WARNING: floating-point modulo arithmetic is not reliable (pulses are
-        # missed). Switch to integer arithmetic in ms; this assumes that 
-        # time_step >= 2*ms.
-        t_in_TR = int(numpy.round(1000*t)) % int(numpy.round(TR.convert_to(ms)))
-        t_in_TE = t_in_TR % int(numpy.round(TE.convert_to(ms)))
+        t_in_TR = int(numpy.round(t.convert_to(ms))) % TR_ms
+        t_in_TE = t_in_TR % TE_ms
         
         if t_in_TR == 0 and step != len(times)-1:
             pulse = excitation
-        elif t_in_TE == int(numpy.round(TE.convert_to(ms)/2)):
-            echo = int(numpy.round((t_in_TR-TE.convert_to(ms)/2)/TE.convert_to(ms)))
+        elif t_in_TE == TE_ms//2:
+            echo = (t_in_TR-TE_ms//2)//TE_ms
             if echo < train_length:
                 pulse = refocalization
             else:
@@ -164,9 +166,9 @@ def update():
             "oij,oj->oi", time_intervals, magnetizations[:,step+1])
     
     signals = [m[:,0]+1j*m[:,1] for m in magnetizations]
-    phases = numpy.vectorize(numpy.angle)(signals)
+    phases = numpy.angle(signals)
     
-    times_ms = [1000*x for x in times]
+    times_ms = [x.convert_to(ms) for x in times]
     
     magnitude_data = document.get_model_by_id("magnitude_data")
     magnitude_data.data = {

@@ -42,7 +42,8 @@ def create_contents():
     magnitude_plot = bokeh.plotting.figure(
         id="magnitude_plot",
         aspect_ratio=1.5,
-        title="", sizing_mode="scale_both", toolbar_location=None)
+        title="", sizing_mode="scale_both", toolbar_location=None,
+        margin=[0,50,0,0])
     magnitude_plot.xaxis.axis_label = "Position (mm)"
     magnitude_plot.yaxis.axis_label = "Magnitude"
     magnitude_plot.x_range.range_padding = 0
@@ -143,8 +144,6 @@ def update():
     
     # Frequency ranges from -max_order to +max_order: the spatial step size
     # is then given by the following expression.
-    # WARNING bin_size should play a role here. With bin_size=1*rad/m, no 
-    # additional step is required
     step = (1/(2*max_order)).convert_to(mm)
     
     x_axis = step*numpy.arange(len(M_transversal))

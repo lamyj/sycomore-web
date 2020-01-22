@@ -42,7 +42,8 @@ def create_contents():
     magnitude_plot = bokeh.plotting.figure(
         id="magnitude_plot",
         aspect_ratio=1.5,
-        title="", sizing_mode="scale_both", toolbar_location=None)
+        title="", sizing_mode="scale_both", toolbar_location=None,
+        margin=[0,50,0,0])
     magnitude_plot.xaxis.axis_label = "Repetition"
     magnitude_plot.yaxis.axis_label = "Magnitude"
     magnitude_plot.x_range.range_padding = 0
@@ -95,9 +96,9 @@ def update():
     TR = document.get_model_by_id("TR").value*ms
     
     species = sycomore.Species(T1, T2)
-    repetitions = int((4*species.T1/TR).magnitude)
+    repetitions = int(4*species.T1/TR)
     
-    phase_steps = [x*deg for x in numpy.arange(0, 181, 1.5)]
+    phase_steps = sycomore.linspace(0*deg, 180*deg, 100)
     
     steady_states = [
         rf_spoiling(

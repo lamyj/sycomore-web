@@ -45,7 +45,8 @@ def create_contents():
     magnitude_plot = bokeh.plotting.figure(
         id="magnitude_plot",
         aspect_ratio=1.5,
-        title="", sizing_mode="scale_both", toolbar_location=None)
+        title="", sizing_mode="scale_both", toolbar_location=None,
+        margin=[0,50,0,0])
     magnitude_plot.xaxis.axis_label = "Repetition"
     magnitude_plot.yaxis.axis_label = "Magnitude"
     magnitude_plot.x_range.range_padding = 0
@@ -101,7 +102,7 @@ def update():
     species = sycomore.Species(T1, T2)
     model = sycomore.epg.Regular(species)
     
-    repetitions = int((4*species.T1/TR).magnitude)
+    repetitions = int(4*species.T1/TR)
     
     echoes = rf_spoiling(
         model, flip_angle, TE, TR, slice_thickness, phase_step, repetitions)
