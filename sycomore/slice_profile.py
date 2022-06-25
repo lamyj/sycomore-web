@@ -15,22 +15,19 @@ title = "Slice profile"
 def create_contents():
     # Species controls
     T1 = bokeh.models.Slider(
-        id="T1", title="T1 (ms)", 
-        value=600, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="T1", title="T1 (ms)", value=600, start=0, end=2000, step=1)
     T2 = bokeh.models.Slider(
-        id="T2", title="T2 (ms)", 
-        value=400, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="T2", title="T2 (ms)", value=400, start=0, end=2000, step=1)
     
     # Pulse controls
     flip_angle = bokeh.models.Slider(
         id="flip_angle", title="Flip angle (°)",
-        value=90, start=0, end=90, step=1, callback_policy="mouseup")
+        value=90, start=0, end=90, step=1)
     duration = bokeh.models.Slider(
-        id="duration", title="Duration (ms)",
-        value=10, start=1, end=20, step=1, callback_policy="mouseup")
+        id="duration", title="Duration (ms)", value=10, start=1, end=20, step=1)
     zero_crossings = bokeh.models.Slider(
         id="zero_crossings", title="Zero crossings",
-        value=10, start=0, end=20, step=1, callback_policy="mouseup")
+        value=10, start=0, end=20, step=1)
 
     # Data sources
     longitudinal_data = bokeh.models.ColumnDataSource(

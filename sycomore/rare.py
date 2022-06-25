@@ -16,33 +16,28 @@ time_step = 10*ms
 def create_contents():
     # Species controls
     T1 = bokeh.models.Slider(
-        id="T1", title="T1 (ms)", 
-        value=600, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="T1", title="T1 (ms)", value=600, start=0, end=2000, step=1)
     T2 = bokeh.models.Slider(
-        id="T2", title="T2 (ms)", 
-        value=400, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="T2", title="T2 (ms)", value=400, start=0, end=2000, step=1)
     
     # Sequence controls
     excitation = bokeh.models.Slider(
         id="excitation", title="Excitation pulse (°)", 
-        value=90, start=0, end=180, step=1, callback_policy="mouseup")
+        value=90, start=0, end=180, step=1)
     TE = bokeh.models.Slider(
         id="TE", title="TE (ms)", 
-        value=200, start=0, end=2000, step=2*time_step.convert_to(ms), 
-        callback_policy="mouseup")
+        value=200, start=0, end=2000, step=2*time_step.convert_to(ms))
     refocalization = bokeh.models.Slider(
         id="refocalization", title="Refocalization pulse (°)", 
-        value=180, start=0, end=180, step=1, callback_policy="mouseup")
+        value=180, start=0, end=180, step=1)
     train_length = bokeh.models.Slider(
         id="train_length", title="Train length", 
-        value=3, start=1, end=10, step=1, callback_policy="mouseup")
+        value=3, start=1, end=10, step=1)
     TR = bokeh.models.Slider(
         id="TR", title="TR (ms)", 
-        value=1000, start=0, end=2000, step=2*time_step.convert_to(ms), 
-        callback_policy="mouseup")
+        value=1000, start=0, end=2000, step=2*time_step.convert_to(ms))
     repetitions = bokeh.models.Slider(
-        id="repetitions", title="Repetitions", 
-        value=4, start=1, end=10, step=1, callback_policy="mouseup")
+        id="repetitions", title="Repetitions", value=4, start=1, end=10, step=1)
     
     # Data sources
     magnitude_data = bokeh.models.ColumnDataSource(

@@ -15,22 +15,18 @@ title = "RF-Spoiling (efficiency)"
 def create_contents():
     # Species controls
     T1 = bokeh.models.Slider(
-        id="T1", title="T1 (ms)", 
-        value=1000, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="T1", title="T1 (ms)", value=1000, start=0, end=2000, step=1)
     T2 = bokeh.models.Slider(
-        id="T2", title="T2 (ms)", 
-        value=1000, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="T2", title="T2 (ms)", value=1000, start=0, end=2000, step=1)
     
     # Sequence controls
     flip_angle = bokeh.models.Slider(
         id="flip_angle", title="Flip angle (°)",
-        value=30, start=0, end=90, step=1, callback_policy="mouseup")
+        value=30, start=0, end=90, step=1)
     TE = bokeh.models.Slider(
-        id="TE", title="TE (ms)",
-        value=5, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="TE", title="TE (ms)", value=5, start=0, end=2000, step=1)
     TR = bokeh.models.Slider(
-        id="TR", title="TR (ms)",
-        value=25, start=0, end=2000, step=1, callback_policy="mouseup")
+        id="TR", title="TR (ms)", value=25, start=0, end=2000, step=1)
 
     # Data sources
     magnitude_data = bokeh.models.ColumnDataSource(
