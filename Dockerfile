@@ -1,4 +1,4 @@
-FROM python:3.8.0
+FROM python:3.9.13
 
 ADD ./sycomore/requirements.txt /tmp/requirements.txt
 
