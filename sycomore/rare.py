@@ -11,7 +11,7 @@ import utils
 
 title = "RARE"
 
-time_step = 10*ms
+time_step = 5*ms
 
 def create_contents():
     # Species controls
@@ -118,7 +118,7 @@ def update():
     positions_count = 192
     
     steps = 1+int(repetitions*TR/time_step)
-    times = sycomore.linspace(0*s, repetitions*TR, steps)
+    times_ms = numpy.linspace(0, (repetitions*TR).convert_to(ms), steps)
 
     excitation = sycomore.bloch.pulse(excitation, 90*deg)
     refocalization = sycomore.bloch.pulse(refocalization, 0*rad)
@@ -140,12 +140,12 @@ def update():
     # time_step >= 2*ms.
     TE_ms = int(numpy.round(TE.convert_to(ms)))
     TR_ms = int(numpy.round(TR.convert_to(ms)))
-    for step, t in enumerate(times[:-1]):
+    for step, t in enumerate(times_ms[:-1]):
         
-        t_in_TR = int(numpy.round(t.convert_to(ms))) % TR_ms
+        t_in_TR = int(numpy.round(t)) % TR_ms
         t_in_TE = t_in_TR % TE_ms
         
-        if t_in_TR == 0 and step != len(times)-1:
+        if t_in_TR == 0 and step != len(times_ms)-1:
             pulse = excitation
         elif t_in_TE == TE_ms//2:
             echo = (t_in_TR-TE_ms//2)//TE_ms
@@ -162,8 +162,6 @@ def update():
     
     signals = [m[:,0]+1j*m[:,1] for m in magnetizations]
     phases = numpy.angle(signals)
-    
-    times_ms = [x.convert_to(ms) for x in times]
     
     magnitude_data = document.get_model_by_id("magnitude_data")
     magnitude_data.data = {

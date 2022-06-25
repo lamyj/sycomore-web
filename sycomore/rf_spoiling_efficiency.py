@@ -96,12 +96,15 @@ def update():
     
     phase_steps = sycomore.linspace(0*deg, 180*deg, 100)
     
-    steady_states = [
-        rf_spoiling(
-            sycomore.epg.Regular(species), 
-            flip_angle, TE, TR, slice_thickness, phase_step, repetitions
-        )[-1]
-        for phase_step in phase_steps]
+    steady_states = []
+    for phase_step in phase_steps:
+        model = sycomore.epg.Regular(species)
+        model.threshold = 1e-3
+        steady_state = rf_spoiling(
+                model,
+                flip_angle, TE, TR, slice_thickness, phase_step, repetitions
+            )[-1]
+        steady_states.append(steady_state)
     
     magnitude_data = document.get_model_by_id("magnitude_data")
     magnitude_data.data = {

@@ -97,6 +97,7 @@ def update():
     
     species = sycomore.Species(T1, T2)
     model = sycomore.epg.Regular(species)
+    model.threshold = 1e-3
     
     repetitions = int(4*species.T1/TR)
     

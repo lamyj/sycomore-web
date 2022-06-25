@@ -7,6 +7,7 @@ def rf_spoiling(
 
     t_readout = TR-TE
     G_readout = (2*numpy.pi*rad / (sycomore.gamma*slice_thickness))/(TR-TE)
+    readout = sycomore.TimeInterval(t_readout, G_readout)
     
     echoes = numpy.zeros(repetitions, dtype=complex)
     
@@ -18,7 +19,7 @@ def rf_spoiling(
 
         echoes[r] = model.echo*numpy.exp(-1j*phase.convert_to(rad))
 
-        model.apply_time_interval(t_readout, G_readout)
+        model.apply_time_interval(readout)
     
     return echoes
 

@@ -112,12 +112,13 @@ def update():
         /sinc_pulse.get_time_interval().duration)
     
     species = sycomore.Species(T1, T2)
+    pulse_step = sycomore.TimeInterval(
+        gradient_duration, [0*T/m, 0*T/m, gradient_amplitude])
     
     model = sycomore.epg.Discrete3D(species)
     for index, hard_pulse in enumerate(sinc_pulse.get_pulses()):
         model.apply_pulse(hard_pulse.angle, hard_pulse.phase)
-        model.apply_time_interval(
-            gradient_duration, [0*T/m, 0*T/m, gradient_amplitude])
+        model.apply_time_interval(pulse_step)
     
     # Unfold the F and the Z states: create an array for all orders, including
     # empty ones.
