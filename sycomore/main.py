@@ -7,6 +7,7 @@ import home
 import rare
 import rf_spoiling_evolution
 import rf_spoiling_efficiency
+import se_contrast
 import slice_profile
 
 experiments = collections.OrderedDict(
@@ -15,6 +16,7 @@ experiments = collections.OrderedDict(
         home, 
         rare, 
         rf_spoiling_evolution, rf_spoiling_efficiency, 
+        se_contrast,
         slice_profile])
 
 arguments = bokeh.plotting.curdoc().session_context.request.arguments
